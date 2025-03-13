@@ -1,0 +1,15 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /config/
+Disallow: /logs/
+Disallow: /tmp/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: *
+Crawl-delay: 10
+Disallow:
