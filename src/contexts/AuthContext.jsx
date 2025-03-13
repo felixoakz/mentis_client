@@ -1,21 +1,29 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { loginApi, registerApi } from '@/api/auth';
 import { responseErrors } from '@/utils/helpers';
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+
+    const savedUser = localStorage.getItem('user')
+    if (savedUser) setUser(JSON.parse(savedUser))
+
+  }, [])
 
   const login = async (data) => {
     try {
       const response = await loginApi(data);
-      if (response.status === 200) {
-        const { token, user } = response.data;
 
-        localStorage.setItem('token', token);
+      if (response.status === 200) {
+        const { user } = response.data;
+        localStorage.setItem('user', JSON.stringify(user));
         setUser(user);
       }
+
     } catch (error) {
       responseErrors(error)
       console.error('# Login error:', error);
@@ -25,7 +33,12 @@ export const AuthProvider = ({ children }) => {
   const registerUser = async (data) => {
     try {
       const response = await registerApi(data);
-      setUser(response.data.user);
+
+      if (response.status === 200) {
+        const { user } = response.data;
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+      }
 
     } catch (error) {
       responseErrors(error)
@@ -34,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 
@@ -44,9 +57,7 @@ export const AuthProvider = ({ children }) => {
       login,
       logout,
       registerUser,
-    }),
-    [user]
-  );
+    }), [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
