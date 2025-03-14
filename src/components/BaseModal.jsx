@@ -23,7 +23,7 @@ const BaseModal = ({ id, title, children, onClose }) => {
 
   return (
     <dialog id={id} ref={modalRef} className="modal">
-      <div className="flex flex-col items-center modal-box border border-primary">
+      <div className="flex flex-col items-center modal-box border border-primary mb-96">
         <h3 className="font-bold text-lg">{title}</h3>
         <div className="py-4">{children}</div>
       </div>

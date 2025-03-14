@@ -171,6 +171,7 @@ const FinancesScreen = () => {
 
     try {
       await deleteAccount(selectedAccount.id);
+
       getAccounts(); // Refresh account list
       setSelectedAccount(accounts.length > 1 ? accounts[0] : null); // Select first available account
       document.getElementById("account_modal").close(); // Close modal
@@ -314,7 +315,7 @@ const FinancesScreen = () => {
       >
         <form
           onSubmit={editingTransactionModal ? handleEditTransaction : handleAddTransaction}
-          className="space-y-2"
+          className="space-y-2 w-96"
         >
           <CurrencyInput
             required
@@ -382,7 +383,7 @@ const FinancesScreen = () => {
       >
         <form
           onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount}
-          className="space-y-2"
+          className="space-y-2 w-96"
         >
           <input
             required
