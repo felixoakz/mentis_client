@@ -20,7 +20,7 @@ const FinancesScreen = () => {
   const [editingAccountModal, setEditingAccountModal] = useState(false);
   const [confirmingTransactionDelete, setConfirmingTransactionDelete] = useState(false);
   const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false);
-  const [accountName, setAccountName] = useState("");
+  const [accountName, setAccountName] = useState(""); console.log({accountName})
 
 
   useEffect(() => {
@@ -137,7 +137,7 @@ const FinancesScreen = () => {
       const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
       setAccounts(updatedAccounts.data.accounts);
       setSelectedAccount(updatedAccount);
-      document.getElementById("account_modal").close(); // Close modal
+      document.getElementById("account_modal").close();
       resetAccountForm()
 
     } catch (error) {
@@ -150,12 +150,15 @@ const FinancesScreen = () => {
 
     try {
       await createAccount({ name: accountName });
-
       const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
+      const updatedAccount = updatedAccounts.data.accounts
+        .find(acc => acc.id === selectedAccount?.id);
+
       setAccounts(updatedAccounts.data.accounts);
-      setSelectedAccount(updatedAccount);
-      document.getElementById("account_modal").close(); // Close modal
+      if (updatedAccount) {
+        setSelectedAccount(updatedAccount);
+      }
+      document.getElementById("account_modal").close();
       resetAccountForm()
 
     } catch (error) {
@@ -231,6 +234,7 @@ const FinancesScreen = () => {
             <BiSolidEditAlt
               onClick={() => {
                 setEditingAccountModal(true);
+                setAccountName(selectedAccount?.name || "");
                 document.getElementById("account_modal").showModal();
               }}
             />
@@ -297,7 +301,7 @@ const FinancesScreen = () => {
         <div className="flex flex-col items-end">
           <label className="text-md font-medium text-neutral-500">Balance</label>
           <div className="font-semibold text-4xl">
-            {selectedAccount ? formatCurrency(selectedAccount.balance) : "Loading..."}
+            {selectedAccount ? formatCurrency(selectedAccount.balance) : "-"}
           </div>
         </div>
       </div>
@@ -310,7 +314,6 @@ const FinancesScreen = () => {
       >
         <form
           onSubmit={editingTransactionModal ? handleEditTransaction : handleAddTransaction}
-          id="transaction-form"
           className="space-y-2"
         >
           <CurrencyInput
@@ -375,11 +378,10 @@ const FinancesScreen = () => {
       <BaseModal
         id={"account_modal"}
         title={editingAccountModal ? "Edit Account" : "Add Account"}
-        onClose={resetForm} // Reset fields when modal closes
+        onClose={resetAccountForm}
       >
         <form
           onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount}
-          id="transaction-form"
           className="space-y-2"
         >
           <input
@@ -406,7 +408,7 @@ const FinancesScreen = () => {
           )}
 
           {confirmingAccountDelete && (
-            <div className="flex space-x-2 w-full">
+            <div className="flex space-x-2">
               <button
                 className="btn bg-green-400 border-none flex-1"
                 onClick={handleDeleteAccount}
