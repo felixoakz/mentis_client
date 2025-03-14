@@ -6,6 +6,8 @@ import { MdOutlineAddCircleOutline } from "react-icons/md";
 import { BiSolidEditAlt } from "react-icons/bi";
 import BaseModal from "@/components/BaseModal";
 import CurrencyInput from "react-currency-input-field";
+import Big from "big.js";
+
 
 const FinancesScreen = () => {
   const [transactions, setTransactions] = useState([]);
@@ -56,7 +58,7 @@ const FinancesScreen = () => {
 
     const transactionData = {
       account_id: selectedAccount?.id,
-      amount: Math.round(parseFloat(amount.replace(".", "").replace(",", ".")) * 100), // Store in cents
+      amount: Big(parseFloat(amount.replace(".", "").replace(",", ".")) * 100),
       description,
     };
 
@@ -82,7 +84,7 @@ const FinancesScreen = () => {
     event.preventDefault();
 
     const transactionData = {
-      amount: Math.round(parseFloat(amount.replace(".", "").replace(",", ".")) * 100), // Store in cents
+      amount: Big(parseFloat(amount.replace(".", "").replace(",", ".")) * 100),
       description,
     };
 
@@ -192,7 +194,7 @@ const FinancesScreen = () => {
   const openEditModal = (transaction) => {
     setSelectedTransaction(transaction);
     setEditingTransactionModal(true);
-    setAmount(Math.round(transaction.amount / 100).toFixed(2).replace(".", ","));
+    setAmount(Big(transaction.amount / 100).toFixed(2).replace(".", ","));
     setDescription(transaction.description);
     document.getElementById("transaction_modal").showModal();
   };
