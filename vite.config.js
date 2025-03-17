@@ -7,9 +7,9 @@ import path from 'path';
 export default defineConfig({
     plugins: [react()],
     css: {
-      postcss: {
-        plugins: [tailwindcss()],
-      },
+        postcss: {
+            plugins: [tailwindcss()],
+        },
     },
     resolve: {
         alias: {
@@ -20,4 +20,8 @@ export default defineConfig({
         'process.env': {},
     },
     base: '/', // Ensure Vite generates paths starting from the root
+    build: {
+        outDir: 'build',
+        sourcemap: false,
+    },
 });

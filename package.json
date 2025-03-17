@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "REACT_APP_API_URL=https://appmentis.ddns.net/api/ GENERATE_SOURCEMAP=false vite build",
+    "build": "REACT_APP_API_URL=https://appmentis.ddns.net/api/ vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
