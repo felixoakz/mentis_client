@@ -19,4 +19,5 @@ export default defineConfig({
     define: {
         'process.env': {},
     },
+    base: '/', // Ensure Vite generates paths starting from the root
 });
