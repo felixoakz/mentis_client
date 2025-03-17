@@ -8,7 +8,7 @@ export const responseErrors = async (error) => {
   }
 
   if (error.response) {
-    const errorMsg = `${error.response.data.message}`
+    const errorMsg = `${error.response.data.message ?? error.response.data.error}`
     toast.warn(errorMsg)
   }
 };

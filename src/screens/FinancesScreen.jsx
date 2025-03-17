@@ -7,6 +7,7 @@ import { BiSolidEditAlt } from "react-icons/bi";
 import BaseModal from "@/components/BaseModal";
 import CurrencyInput from "react-currency-input-field";
 import Big from "big.js";
+import { toast } from "react-toastify";
 
 
 const FinancesScreen = () => {
@@ -20,8 +21,7 @@ const FinancesScreen = () => {
   const [editingAccountModal, setEditingAccountModal] = useState(false);
   const [confirmingTransactionDelete, setConfirmingTransactionDelete] = useState(false);
   const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false);
-  const [accountName, setAccountName] = useState(""); console.log({accountName})
-
+  const [accountName, setAccountName] = useState("");
 
   useEffect(() => {
     getAccounts();
@@ -38,7 +38,8 @@ const FinancesScreen = () => {
       const res = await listAccounts();
       const accountsData = res.data.accounts;
       setAccounts(accountsData);
-      setSelectedAccount(accountsData[0]);
+      setSelectedAccount(accountsData[0] ?? null);
+
     } catch (error) {
       responseErrors(error);
     }
@@ -48,6 +49,7 @@ const FinancesScreen = () => {
     try {
       const res = await listTransactions(accountId);
       setTransactions(res.data.transactions);
+
     } catch (error) {
       responseErrors(error);
     }
@@ -58,7 +60,7 @@ const FinancesScreen = () => {
 
     const transactionData = {
       account_id: selectedAccount?.id,
-      amount: Big(parseFloat(amount.replace(".", "").replace(",", ".")) * 100),
+      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
       description,
     };
 
@@ -72,7 +74,6 @@ const FinancesScreen = () => {
       setAccounts(updatedAccounts.data.accounts);
       setSelectedAccount(updatedAccount);
 
-      // Reset form fields and close modal
       resetForm();
       document.getElementById("transaction_modal").close();
     } catch (error) {
@@ -84,7 +85,7 @@ const FinancesScreen = () => {
     event.preventDefault();
 
     const transactionData = {
-      amount: Big(parseFloat(amount.replace(".", "").replace(",", ".")) * 100),
+      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
       description,
     };
 
@@ -150,14 +151,13 @@ const FinancesScreen = () => {
 
     try {
       await createAccount({ name: accountName });
-      const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts
-        .find(acc => acc.id === selectedAccount?.id);
 
-      setAccounts(updatedAccounts.data.accounts);
-      if (updatedAccount) {
-        setSelectedAccount(updatedAccount);
-      }
+      const res = await listAccounts();
+      const updatedAccounts = res.data.accounts
+
+      setAccounts(updatedAccounts);
+      setSelectedAccount(updatedAccounts.find(acc => acc.name === accountName));
+
       document.getElementById("account_modal").close();
       resetAccountForm()
 
@@ -166,16 +166,25 @@ const FinancesScreen = () => {
     }
   };
 
+
   const handleDeleteAccount = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
     try {
       await deleteAccount(selectedAccount.id);
 
-      getAccounts(); // Refresh account list
-      setSelectedAccount(accounts.length > 1 ? accounts[0] : null); // Select first available account
-      document.getElementById("account_modal").close(); // Close modal
+      const updatedAccounts = await listAccounts();
+      setAccounts(updatedAccounts.data.accounts);
 
+      if (updatedAccounts.data.accounts.length > 0) {
+        setSelectedAccount(updatedAccounts.data.accounts[0]);
+        getTransactions(updatedAccounts.data.accounts[0].id);
+      } else {
+        setSelectedAccount(null);
+        setTransactions([]); // Clear transactions if no accounts are left
+      }
+
+      document.getElementById("account_modal").close(); // Close modal
     } catch (error) {
       responseErrors(error);
     }
@@ -234,9 +243,13 @@ const FinancesScreen = () => {
           <button className="text-4xl">
             <BiSolidEditAlt
               onClick={() => {
-                setEditingAccountModal(true);
-                setAccountName(selectedAccount?.name || "");
-                document.getElementById("account_modal").showModal();
+                if (accounts.length === 0) {
+                  toast.warn('Add an account first!')
+                } else {
+                  setEditingAccountModal(true);
+                  setAccountName(selectedAccount?.name || "");
+                  document.getElementById("account_modal").showModal();
+                }
               }}
             />
           </button>
@@ -293,18 +306,25 @@ const FinancesScreen = () => {
         <button
           className="text-5xl text-secondary"
           onClick={() => {
-            setEditingTransactionModal(false);
-            document.getElementById("transaction_modal").showModal();
+            if (accounts.length === 0) {
+              toast.warn('Add an account first!')
+
+            } else {
+              setEditingTransactionModal(false);
+              document.getElementById("transaction_modal").showModal();
+            }
           }}
         >
           <MdOutlineAddCircleOutline />
         </button>
+
         <div className="flex flex-col items-end">
           <label className="text-md font-medium text-neutral-500">Balance</label>
           <div className="font-semibold text-4xl">
             {selectedAccount ? formatCurrency(selectedAccount.balance) : "-"}
           </div>
         </div>
+
       </div>
 
 
