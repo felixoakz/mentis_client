@@ -26,6 +26,14 @@ export const removeSpecialCharacters = (str) => {
 };
 
 export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+  }).format(amount / 100);
+};
+
+export const formatCurrencyUsd = (amount) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
