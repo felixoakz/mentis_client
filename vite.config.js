@@ -16,10 +16,7 @@ export default defineConfig({
             '@': path.resolve(__dirname, 'src'),
         },
     },
-    define: {
-        'process.env': {},
-    },
-    base: '/', // Ensure Vite generates paths starting from the root
+    base: '/',
     build: {
         outDir: 'build',
         sourcemap: false,
