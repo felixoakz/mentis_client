@@ -8,10 +8,13 @@ import { responseErrors } from "@/utils/helpers"
 import BaseModal from "@/components/BaseModal"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import { RiLogoutBoxLine } from "react-icons/ri";
+
 
 const HomeScreen = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "synthwave")
   const [accounts, setAccounts] = useState([])
   const [selectedAccount, setSelectedAccount] = useState(null)
@@ -27,6 +30,29 @@ const HomeScreen = () => {
   useEffect(() => {
     getAccounts()
   }, [])
+
+  const themes = [
+    "lofi",
+    "bumblebee",
+    "retro",
+    "valentine",
+    "pastel",
+    "autumn",
+    "acid",
+    "nord",
+    "black",
+    "synthwave",
+    "forest",
+    "aqua",
+    "luxury",
+    "business",
+    "night",
+    "dim",
+  ]
+
+  const handleThemeChange = (event) => setTheme(event.target.value)
+
+  const handleLogout = async () => await logout()
 
   const getAccounts = async () => {
     try {
@@ -107,7 +133,6 @@ const HomeScreen = () => {
     setSelectedAccount(account)
   }
 
-  // Update the openFinancesWithAccount function to pass account name as state
   const openFinancesWithAccount = () => {
     if (selectedAccount) {
       navigate(`/finances/${selectedAccount.id}`, {
@@ -118,42 +143,35 @@ const HomeScreen = () => {
     }
   }
 
-  const themes = [
-    "lofi",
-    "bumblebee",
-    "retro",
-    "valentine",
-    "pastel",
-    "autumn",
-    "acid",
-    "nord",
-    "black",
-    "synthwave",
-    "forest",
-    "aqua",
-    "luxury",
-    "business",
-    "night",
-    "dim",
-  ]
-
-  const handleThemeChange = (event) => setTheme(event.target.value)
-  const handleLogout = async () => await logout()
-
-  const username = user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : "Guest"
-
   return (
     <Layout>
-      <div className="flex flex-col space-y-4 p-4">
-        <div className="text-primary text-2xl font-bold mb-4">Hi, {username}!</div>
+      <div className="flex flex-col space-y-12 p-4 max-w-3xl w-full mx-auto">
+
+        <button
+          className="text-5xl text-secondary"
+          onClick={handleLogout}
+        >
+          <RiLogoutBoxLine />
+        </button>
+
+        <div
+          className="text-accent text-end text-4xl font-bold"
+        >
+          Hi, {
+            user?.username ?
+              user.username.charAt(0).toUpperCase()
+              + user.username.slice(1)
+              : "Guest"
+          }!
+        </div>
 
         {/* Account Management Section */}
-        <div className="card bg-base-200 shadow-xl p-4">
-          <h2 className="text-xl font-bold mb-4">Your Accounts</h2>
+        <div className="card bg-base-200 shadow-xl p-4 space-y-4">
+          <h2 className="text-accent text-xl font-bold">Accounts</h2>
 
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between gap-2">
             <select
-              className="select select-bordered w-full max-w-xs"
+              className="select select-bordered w-full"
               value={selectedAccount?.id || ""}
               onChange={(e) => handleAccountSelect(e.target.value)}
             >
@@ -167,7 +185,7 @@ const HomeScreen = () => {
               ))}
             </select>
 
-            <div className="flex space-x-2 px-2 ml-2">
+            <div className="flex space-x-2 justify-end sm:justify-start">
               <button className="text-3xl">
                 <BiSolidEditAlt
                   onClick={() => {
@@ -193,18 +211,39 @@ const HomeScreen = () => {
             </div>
           </div>
 
-          <button className="btn btn-primary w-full" onClick={openFinancesWithAccount} disabled={!selectedAccount}>
+          <button
+            className="btn btn-primary w-full"
+            onClick={openFinancesWithAccount}
+            disabled={!selectedAccount}
+          >
             View Transactions
           </button>
+
         </div>
 
         {/* Theme Selection */}
         <div className="card bg-base-200 shadow-xl p-4">
+
+          <span
+            className="text-accent text-xl font-bold label-text mb-4"
+          >
+            Configs
+          </span>
+
           <label className="form-control">
             <div className="label">
-              <span className="label-text">Select Color Theme</span>
+              <span
+                className="text-secondary font-bold label-text"
+              >
+                Select a Theme
+              </span>
             </div>
-            <select className="select select-primary" value={theme} onChange={handleThemeChange}>
+
+            <select
+              className="select select-primary"
+              value={theme}
+              onChange={handleThemeChange}
+            >
               <option disabled>Select a theme</option>
               {themes.map((themeOption) => (
                 <option key={themeOption} value={themeOption}>
@@ -213,11 +252,8 @@ const HomeScreen = () => {
               ))}
             </select>
           </label>
-        </div>
 
-        <button className="btn btn-warning" onClick={handleLogout}>
-          Logout
-        </button>
+        </div>
 
         {/* Account Modal */}
         <BaseModal
