@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 const Layout = ({ children }) => {
 
   useEffect(() => {
-    const theme = localStorage.getItem('theme') || 'light';
+    const theme = localStorage.getItem('theme') || 'synthwave';
     document.documentElement.setAttribute('data-theme', theme);
   }, []);
 

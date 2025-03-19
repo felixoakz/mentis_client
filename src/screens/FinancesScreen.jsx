@@ -1,272 +1,143 @@
-import { useEffect, useState } from "react";
-import { createTransaction, deleteTransaction, editTransaction, listTransactions } from "@/api/transactions";
-import { formatCurrency, formatDate, responseErrors } from "@/utils/helpers";
-import { editAccount, listAccounts, createAccount, deleteAccount } from "@/api/accounts";
-import { MdOutlineAddCircleOutline } from "react-icons/md";
-import { BiSolidEditAlt } from "react-icons/bi";
-import BaseModal from "@/components/BaseModal";
-import CurrencyInput from "react-currency-input-field";
-import Big from "big.js";
-import { toast } from "react-toastify";
-
+import { useEffect, useState } from "react"
+import { createTransaction, deleteTransaction, editTransaction, listTransactions } from "@/api/transactions"
+import { formatCurrency, formatDate, responseErrors } from "@/utils/helpers"
+import { MdOutlineAddCircleOutline } from "react-icons/md"
+import BaseModal from "@/components/BaseModal"
+import CurrencyInput from "react-currency-input-field"
+import Big from "big.js"
+import { toast } from "react-toastify"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 
 const FinancesScreen = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [accounts, setAccounts] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [editingTransactionModal, setEditingTransactionModal] = useState(false);
-  const [editingAccountModal, setEditingAccountModal] = useState(false);
-  const [confirmingTransactionDelete, setConfirmingTransactionDelete] = useState(false);
-  const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false);
-  const [accountName, setAccountName] = useState("");
+  const { accountId } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const accountName = location.state?.accountName || "Account"
+  const accountBalance = location.state?.balance || 0
+
+  const [transactions, setTransactions] = useState([])
+  const [amount, setAmount] = useState("")
+  const [description, setDescription] = useState("")
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
+  const [editingTransactionModal, setEditingTransactionModal] = useState(false)
+  const [confirmingTransactionDelete, setConfirmingTransactionDelete] = useState(false)
+  const [balance, setBalance] = useState(accountBalance)
 
   useEffect(() => {
-    getAccounts();
-  }, []);
-
-  useEffect(() => {
-    if (selectedAccount) {
-      getTransactions(selectedAccount.id);
+    if (accountId) {
+      getTransactions(accountId)
+    } else {
+      // If no account ID is provided, redirect to home
+      toast.warn("No account selected. Redirecting to home.")
+      navigate("/", { replace: true })
     }
-  }, [selectedAccount]);
-
-  const getAccounts = async () => {
-    try {
-      const res = await listAccounts();
-      const accountsData = res.data.accounts;
-      setAccounts(accountsData);
-      setSelectedAccount(accountsData[0] ?? null);
-
-    } catch (error) {
-      responseErrors(error);
-    }
-  };
+  }, [accountId, navigate])
 
   const getTransactions = async (accountId) => {
     try {
-      const res = await listTransactions(accountId);
-      setTransactions(res.data.transactions);
+      const res = await listTransactions(accountId)
+      setTransactions(res.data.transactions)
 
+      // If the API response includes account balance, update it
+      if (res.data.account && res.data.account.balance !== undefined) {
+        setBalance(res.data.account.balance)
+      }
     } catch (error) {
-      responseErrors(error);
+      responseErrors(error)
+      // If there's an error (like account not found), redirect to home
+      toast.error("Could not load account transactions.")
+      navigate("/", { replace: true })
     }
-  };
+  }
 
   const handleAddTransaction = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     const transactionData = {
-      account_id: selectedAccount?.id,
+      account_id: accountId,
       amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
       description,
-    };
+    }
 
     try {
-      await createTransaction(transactionData);
-
-      // Refresh transactions and accounts
-      getTransactions(selectedAccount.id);
-      const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
-      setAccounts(updatedAccounts.data.accounts);
-      setSelectedAccount(updatedAccount);
-
-      resetForm();
-      document.getElementById("transaction_modal").close();
+      await createTransaction(transactionData)
+      // Refresh transactions
+      getTransactions(accountId)
+      resetForm()
+      document.getElementById("transaction_modal").close()
     } catch (error) {
-      responseErrors(error);
+      responseErrors(error)
     }
-  };
+  }
 
   const handleEditTransaction = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     const transactionData = {
       amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
       description,
-    };
+    }
 
     try {
-      await editTransaction(selectedTransaction.id, transactionData);
-
-      // Refresh transactions and accounts
-      getTransactions(selectedAccount.id);
-      const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
-      setAccounts(updatedAccounts.data.accounts);
-      setSelectedAccount(updatedAccount);
-
-      // Reset form fields and close modal
-      resetForm();
-      document.getElementById("transaction_modal").close();
+      await editTransaction(selectedTransaction.id, transactionData)
+      // Refresh transactions
+      getTransactions(accountId)
+      resetForm()
+      document.getElementById("transaction_modal").close()
     } catch (error) {
-      responseErrors(error);
+      responseErrors(error)
     }
-  };
+  }
 
   const handleDeleteTransaction = async (event) => {
-    event.preventDefault();
-
-    try {
-      await deleteTransaction(selectedTransaction.id);
-
-      // Refresh transactions and accounts
-      getTransactions(selectedAccount.id);
-      const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
-      setAccounts(updatedAccounts.data.accounts);
-      setSelectedAccount(updatedAccount);
-
-      // Reset form fields and close modal
-      resetForm();
-      document.getElementById("transaction_modal").close();
-    } catch (error) {
-      responseErrors(error);
-    }
-  };
-
-  const handleEditAccount = async (event) => {
-    event.preventDefault();
-
-    try {
-      await editAccount(selectedAccount.id, { name: accountName });
-
-      const updatedAccounts = await listAccounts();
-      const updatedAccount = updatedAccounts.data.accounts.find(acc => acc.id === selectedAccount.id);
-      setAccounts(updatedAccounts.data.accounts);
-      setSelectedAccount(updatedAccount);
-      document.getElementById("account_modal").close();
-      resetAccountForm()
-
-    } catch (error) {
-      responseErrors(error);
-    }
-  };
-
-  const handleAddAccount = async (event) => {
     event.preventDefault()
 
     try {
-      await createAccount({ name: accountName });
-
-      const res = await listAccounts();
-      const updatedAccounts = res.data.accounts
-
-      setAccounts(updatedAccounts);
-      setSelectedAccount(updatedAccounts.find(acc => acc.name === accountName));
-
-      document.getElementById("account_modal").close();
-      resetAccountForm()
-
+      await deleteTransaction(selectedTransaction.id)
+      // Refresh transactions
+      getTransactions(accountId)
+      resetForm()
+      document.getElementById("transaction_modal").close()
     } catch (error) {
-      responseErrors(error);
+      responseErrors(error)
     }
-  };
-
-
-  const handleDeleteAccount = async (event) => {
-    event.preventDefault();
-
-    try {
-      await deleteAccount(selectedAccount.id);
-
-      const updatedAccounts = await listAccounts();
-      setAccounts(updatedAccounts.data.accounts);
-
-      if (updatedAccounts.data.accounts.length > 0) {
-        setSelectedAccount(updatedAccounts.data.accounts[0]);
-        getTransactions(updatedAccounts.data.accounts[0].id);
-      } else {
-        setSelectedAccount(null);
-        setTransactions([]); // Clear transactions if no accounts are left
-      }
-
-      document.getElementById("account_modal").close(); // Close modal
-    } catch (error) {
-      responseErrors(error);
-    }
-  };
+  }
 
   const resetForm = () => {
-    setAmount("");
-    setDescription("");
-    setSelectedTransaction(null);
-    setEditingTransactionModal(false);
-    setConfirmingTransactionDelete(false);
-  };
-
-  const resetAccountForm = () => {
-    setAccountName("");
-    setEditingAccountModal(false);
-    setConfirmingAccountDelete(false);
-  };
+    setAmount("")
+    setDescription("")
+    setSelectedTransaction(null)
+    setEditingTransactionModal(false)
+    setConfirmingTransactionDelete(false)
+  }
 
   const openEditModal = (transaction) => {
-    setSelectedTransaction(transaction);
-    setEditingTransactionModal(true);
-    setAmount(Big(transaction.amount / 100).toFixed(2).replace(".", ","));
-    setDescription(transaction.description);
-    document.getElementById("transaction_modal").showModal();
-  };
+    setSelectedTransaction(transaction)
+    setEditingTransactionModal(true)
+    setAmount(
+      Big(transaction.amount / 100)
+        .toFixed(2)
+        .replace(".", ","),
+    )
+    setDescription(transaction.description)
+    document.getElementById("transaction_modal").showModal()
+  }
 
   const groupedTransactions = transactions.reduce((acc, transaction) => {
-    const day = formatDate(transaction.created_at);
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(transaction);
-    return acc;
-  }, {});
+    const day = formatDate(transaction.created_at)
+    if (!acc[day]) acc[day] = []
+    acc[day].push(transaction)
+    return acc
+  }, {})
 
   return (
     <div className="flex flex-col w-full h-full p-4 bg-base-100 text-base-content">
-
-      {/* Account Selector */}
-      <div className="flex justify-between">
-        <select
-          className="select select-md select-bordered w-full text-xl"
-          value={selectedAccount?.id}
-          onChange={(e) => {
-            const account = accounts.find((acc) => acc.id === e.target.value);
-            setSelectedAccount(account);
-          }}
-        >
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>
-              {account.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex space-x-2 px-2 ml-2">
-          <button className="text-4xl">
-            <BiSolidEditAlt
-              onClick={() => {
-                if (accounts.length === 0) {
-                  toast.warn('Add an account first!')
-                } else {
-                  setEditingAccountModal(true);
-                  setAccountName(selectedAccount?.name || "");
-                  document.getElementById("account_modal").showModal();
-                }
-              }}
-            />
-          </button>
-
-          <button
-            className="text-4xl"
-          >
-            <MdOutlineAddCircleOutline
-              onClick={() => {
-                setEditingAccountModal(false);
-                document.getElementById("account_modal").showModal();
-              }}
-            />
-          </button>
-
-        </div>
-
+      {/* Account Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">{accountName}</h1>
+        <button className="btn btn-outline btn-sm" onClick={() => navigate("/")}>
+          Back to Accounts
+        </button>
       </div>
 
       {/* Transactions */}
@@ -286,10 +157,7 @@ const FinancesScreen = () => {
                     <div>
                       <p className="text-accent">{transaction.description}</p>
                     </div>
-                    <p
-                      className={`text-lg font-semibold ${transaction.amount >= 0 ? "text-success" : "text-error"
-                        }`}
-                    >
+                    <p className={`text-lg font-semibold ${transaction.amount >= 0 ? "text-success" : "text-error"}`}>
                       {formatCurrency(transaction.amount)}
                     </p>
                   </div>
@@ -306,13 +174,8 @@ const FinancesScreen = () => {
         <button
           className="text-5xl text-secondary"
           onClick={() => {
-            if (accounts.length === 0) {
-              toast.warn('Add an account first!')
-
-            } else {
-              setEditingTransactionModal(false);
-              document.getElementById("transaction_modal").showModal();
-            }
+            setEditingTransactionModal(false)
+            document.getElementById("transaction_modal").showModal()
           }}
         >
           <MdOutlineAddCircleOutline />
@@ -320,18 +183,14 @@ const FinancesScreen = () => {
 
         <div className="flex flex-col items-end">
           <label className="text-md font-medium text-neutral-500">Balance</label>
-          <div className="font-semibold text-4xl">
-            {selectedAccount ? formatCurrency(selectedAccount.balance) : "-"}
-          </div>
+          <div className="font-semibold text-4xl">{formatCurrency(balance)}</div>
         </div>
-
       </div>
-
 
       <BaseModal
         id={"transaction_modal"}
         title={editingTransactionModal ? "Edit Transaction" : "Add Transaction"}
-        onClose={resetForm} // Reset fields when modal closes
+        onClose={resetForm}
       >
         <form
           onSubmit={editingTransactionModal ? handleEditTransaction : handleAddTransaction}
@@ -371,6 +230,7 @@ const FinancesScreen = () => {
             <button
               className="btn bg-red-400 border-none w-full"
               onClick={() => setConfirmingTransactionDelete(true)}
+              type="button"
             >
               Delete Transaction
             </button>
@@ -378,78 +238,23 @@ const FinancesScreen = () => {
 
           {confirmingTransactionDelete && (
             <div className="flex space-x-2 w-full">
-              <button
-                className="btn bg-green-400 border-none flex-1"
-                onClick={handleDeleteTransaction}
-              >
+              <button className="btn bg-green-400 border-none flex-1" onClick={handleDeleteTransaction} type="button">
                 Confirm
               </button>
               <button
                 className="btn bg-red-400 border-none flex-1"
                 onClick={() => setConfirmingTransactionDelete(false)}
+                type="button"
               >
                 Cancel
               </button>
             </div>
           )}
-
         </form>
       </BaseModal>
-
-      <BaseModal
-        id={"account_modal"}
-        title={editingAccountModal ? "Edit Account" : "Add Account"}
-        onClose={resetAccountForm}
-      >
-        <form
-          onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount}
-          className="space-y-2 w-96"
-        >
-          <input
-            required
-            type="text"
-            name="name"
-            placeholder="name"
-            className="input input-bordered w-full"
-            value={accountName}
-            onChange={(e) => setAccountName(e.target.value)}
-          />
-
-          <button type="submit" className="btn btn-primary w-full">
-            Save
-          </button>
-
-          {editingAccountModal && !confirmingAccountDelete && (
-            <button
-              className="btn bg-red-400 border-none w-full"
-              onClick={() => setConfirmingAccountDelete(true)}
-            >
-              Delete Account
-            </button>
-          )}
-
-          {confirmingAccountDelete && (
-            <div className="flex space-x-2">
-              <button
-                className="btn bg-green-400 border-none flex-1"
-                onClick={handleDeleteAccount}
-              >
-                Confirm
-              </button>
-              <button
-                className="btn bg-red-400 border-none flex-1"
-                onClick={() => setConfirmingAccountDelete(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-
-        </form>
-      </BaseModal>
-
     </div>
-  );
-};
+  )
+}
 
-export default FinancesScreen;
+export default FinancesScreen
+

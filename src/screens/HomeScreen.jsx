@@ -1,19 +1,275 @@
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react"
+import { useAuth } from "@/contexts/AuthContext"
+import Layout from "@/components/Layout"
+import { BiSolidEditAlt } from "react-icons/bi"
+import { MdOutlineAddCircleOutline } from "react-icons/md"
+import { listAccounts, createAccount, editAccount, deleteAccount } from "@/api/accounts"
+import { responseErrors } from "@/utils/helpers"
+import BaseModal from "@/components/BaseModal"
+import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 
 const HomeScreen = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "synthwave")
+  const [accounts, setAccounts] = useState([])
+  const [selectedAccount, setSelectedAccount] = useState(null)
+  const [accountName, setAccountName] = useState("")
+  const [editingAccountModal, setEditingAccountModal] = useState(false)
+  const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false)
 
-  const username = user?.username
-    ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
-    : "Guest";
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme)
+    localStorage.setItem("theme", theme)
+  }, [theme])
+
+  useEffect(() => {
+    getAccounts()
+  }, [])
+
+  const getAccounts = async () => {
+    try {
+      const res = await listAccounts()
+      const accountsData = res.data.accounts
+      setAccounts(accountsData)
+      setSelectedAccount(accountsData[0] ?? null)
+    } catch (error) {
+      responseErrors(error)
+    }
+  }
+
+  const handleEditAccount = async (event) => {
+    event.preventDefault()
+
+    try {
+      await editAccount(selectedAccount.id, { name: accountName })
+
+      const updatedAccounts = await listAccounts()
+      const updatedAccount = updatedAccounts.data.accounts.find((acc) => acc.id === selectedAccount.id)
+      setAccounts(updatedAccounts.data.accounts)
+      setSelectedAccount(updatedAccount)
+      document.getElementById("account_modal").close()
+      resetAccountForm()
+    } catch (error) {
+      responseErrors(error)
+    }
+  }
+
+  const handleAddAccount = async (event) => {
+    event.preventDefault()
+
+    try {
+      await createAccount({ name: accountName })
+
+      const res = await listAccounts()
+      const updatedAccounts = res.data.accounts
+
+      setAccounts(updatedAccounts)
+      setSelectedAccount(updatedAccounts.find((acc) => acc.name === accountName))
+
+      document.getElementById("account_modal").close()
+      resetAccountForm()
+    } catch (error) {
+      responseErrors(error)
+    }
+  }
+
+  const handleDeleteAccount = async (event) => {
+    event.preventDefault()
+
+    try {
+      await deleteAccount(selectedAccount.id)
+
+      const updatedAccounts = await listAccounts()
+      setAccounts(updatedAccounts.data.accounts)
+
+      if (updatedAccounts.data.accounts.length > 0) {
+        setSelectedAccount(updatedAccounts.data.accounts[0])
+      } else {
+        setSelectedAccount(null)
+      }
+
+      document.getElementById("account_modal").close()
+    } catch (error) {
+      responseErrors(error)
+    }
+  }
+
+  const resetAccountForm = () => {
+    setAccountName("")
+    setEditingAccountModal(false)
+    setConfirmingAccountDelete(false)
+  }
+
+  const handleAccountSelect = (accountId) => {
+    const account = accounts.find((acc) => acc.id === accountId)
+    setSelectedAccount(account)
+  }
+
+  // Update the openFinancesWithAccount function to pass account name as state
+  const openFinancesWithAccount = () => {
+    if (selectedAccount) {
+      navigate(`/finances/${selectedAccount.id}`, {
+        state: { accountName: selectedAccount.name, balance: selectedAccount.balance },
+      })
+    } else {
+      toast.warn("Please select an account first!")
+    }
+  }
+
+  const themes = [
+    "lofi",
+    "bumblebee",
+    "retro",
+    "valentine",
+    "pastel",
+    "autumn",
+    "acid",
+    "nord",
+    "black",
+    "synthwave",
+    "forest",
+    "aqua",
+    "luxury",
+    "business",
+    "night",
+    "dim",
+  ]
+
+  const handleThemeChange = (event) => setTheme(event.target.value)
+  const handleLogout = async () => await logout()
+
+  const username = user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : "Guest"
 
   return (
-    <div className="flex flex-col items-center justify-end w-full h-full">
-      <div className="text-primary text-2xl font-bold">
-        Hi, {username}!
-      </div>
-    </div>
-  );
-};
+    <Layout>
+      <div className="flex flex-col space-y-4 p-4">
+        <div className="text-primary text-2xl font-bold mb-4">Hi, {username}!</div>
 
-export default HomeScreen;
+        {/* Account Management Section */}
+        <div className="card bg-base-200 shadow-xl p-4">
+          <h2 className="text-xl font-bold mb-4">Your Accounts</h2>
+
+          <div className="flex justify-between mb-4">
+            <select
+              className="select select-bordered w-full max-w-xs"
+              value={selectedAccount?.id || ""}
+              onChange={(e) => handleAccountSelect(e.target.value)}
+            >
+              <option disabled value="">
+                Select an account
+              </option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex space-x-2 px-2 ml-2">
+              <button className="text-3xl">
+                <BiSolidEditAlt
+                  onClick={() => {
+                    if (accounts.length === 0) {
+                      toast.warn("Add an account first!")
+                    } else {
+                      setEditingAccountModal(true)
+                      setAccountName(selectedAccount?.name || "")
+                      document.getElementById("account_modal").showModal()
+                    }
+                  }}
+                />
+              </button>
+
+              <button className="text-3xl">
+                <MdOutlineAddCircleOutline
+                  onClick={() => {
+                    setEditingAccountModal(false)
+                    document.getElementById("account_modal").showModal()
+                  }}
+                />
+              </button>
+            </div>
+          </div>
+
+          <button className="btn btn-primary w-full" onClick={openFinancesWithAccount} disabled={!selectedAccount}>
+            View Transactions
+          </button>
+        </div>
+
+        {/* Theme Selection */}
+        <div className="card bg-base-200 shadow-xl p-4">
+          <label className="form-control">
+            <div className="label">
+              <span className="label-text">Select Color Theme</span>
+            </div>
+            <select className="select select-primary" value={theme} onChange={handleThemeChange}>
+              <option disabled>Select a theme</option>
+              {themes.map((themeOption) => (
+                <option key={themeOption} value={themeOption}>
+                  {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <button className="btn btn-warning" onClick={handleLogout}>
+          Logout
+        </button>
+
+        {/* Account Modal */}
+        <BaseModal
+          id={"account_modal"}
+          title={editingAccountModal ? "Edit Account" : "Add Account"}
+          onClose={resetAccountForm}
+        >
+          <form onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount} className="space-y-2 w-96">
+            <input
+              required
+              type="text"
+              name="name"
+              placeholder="Account name"
+              className="input input-bordered w-full"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+            />
+
+            <button type="submit" className="btn btn-primary w-full">
+              Save
+            </button>
+
+            {editingAccountModal && !confirmingAccountDelete && (
+              <button
+                className="btn bg-red-400 border-none w-full"
+                onClick={() => setConfirmingAccountDelete(true)}
+                type="button"
+              >
+                Delete Account
+              </button>
+            )}
+
+            {confirmingAccountDelete && (
+              <div className="flex space-x-2">
+                <button className="btn bg-green-400 border-none flex-1" onClick={handleDeleteAccount} type="button">
+                  Confirm
+                </button>
+                <button
+                  className="btn bg-red-400 border-none flex-1"
+                  onClick={() => setConfirmingAccountDelete(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </form>
+        </BaseModal>
+      </div>
+    </Layout>
+  )
+}
+
+export default HomeScreen
+
