@@ -59,7 +59,9 @@ const FinancesScreen = () => {
     }
 
     try {
-      await createTransaction(transactionData)
+      const res = await createTransaction(transactionData)
+      setBalance(res.data.newBalance.balance)
+
       // Refresh transactions
       getTransactions(accountId)
       resetForm()
@@ -182,7 +184,20 @@ const FinancesScreen = () => {
                 ))
 
             ) : (
-              <p className="text-center text-xl font-bold text-primary pt-36">Add some transactions :)</p>
+                <div className="card bg-base-200 shadow-xl p-8 text-center">
+                  <h3 className="text-xl font-semibold text-primary mb-4">No Transactions Yet!</h3>
+                  <p className="text-base-content mb-6">Create your first transaction from this account</p>
+                  <button
+                    className="btn btn-accent mx-auto"
+                    onClick={() => {
+                      setEditingTransactionModal(false)
+                      document.getElementById("transaction_modal").showModal()
+                    }}
+                  >
+                    <MdOutlineAddCircleOutline className="text-lg mr-2" />
+                    Create Transaction
+                  </button>
+                </div>
             )}
 
         </div>

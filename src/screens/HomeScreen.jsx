@@ -2,14 +2,14 @@ import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import Layout from "@/components/Layout"
 import { BiSolidEditAlt } from "react-icons/bi"
-import { MdOutlineAddCircleOutline } from "react-icons/md"
+import { MdOutlineAddCircleOutline, MdDashboard } from "react-icons/md"
+import { RiLogoutBoxLine, RiWalletLine } from "react-icons/ri"
+import { FiSettings } from "react-icons/fi"
 import { listAccounts, createAccount, editAccount, deleteAccount } from "@/api/accounts"
-import { responseErrors } from "@/utils/helpers"
+import { responseErrors, formatCurrency } from "@/utils/helpers"
 import BaseModal from "@/components/BaseModal"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
-import { RiLogoutBoxLine } from "react-icons/ri";
-
 
 const HomeScreen = () => {
   const { user, logout } = useAuth()
@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const [accountName, setAccountName] = useState("")
   const [editingAccountModal, setEditingAccountModal] = useState(false)
   const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
@@ -133,10 +134,10 @@ const HomeScreen = () => {
     setSelectedAccount(account)
   }
 
-  const openFinancesWithAccount = () => {
-    if (selectedAccount) {
-      navigate(`/finances/${selectedAccount.id}`, {
-        state: { accountName: selectedAccount.name, balance: selectedAccount.balance },
+  const openFinancesWithAccount = (account) => {
+    if (account) {
+      navigate(`/finances/${account.id}`, {
+        state: { accountName: account.name, balance: account.balance },
       })
     } else {
       toast.warn("Please select an account first!")
@@ -145,115 +146,144 @@ const HomeScreen = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col space-y-12 p-4 max-w-3xl w-full mx-auto">
+      <div className="flex flex-col min-h-screen bg-base-100">
+        {/* Header */}
+        <header className="flex justify-between items-center p-4 bg-base-200 shadow-md">
 
-        <button
-          className="text-5xl text-secondary"
-          onClick={handleLogout}
-        >
-          <RiLogoutBoxLine />
-        </button>
+          <div className="flex items-center gap-4">
 
-        <div
-          className="text-accent text-end text-4xl font-bold"
-        >
-          Hi, {
-            user?.username ?
-              user.username.charAt(0).toUpperCase()
-              + user.username.slice(1)
-              : "Guest"
-          }!
-        </div>
+            <button onClick={handleLogout} className="text-3xl text-secondary">
+              <RiLogoutBoxLine />
+            </button>
 
-        {/* Account Management Section */}
-        <div className="card bg-base-200 shadow-xl p-4 space-y-4">
-          <h2 className="text-accent text-xl font-bold">Accounts</h2>
-
-          <div className="flex justify-between gap-2">
-            <select
-              className="select select-bordered w-full"
-              value={selectedAccount?.id || ""}
-              onChange={(e) => handleAccountSelect(e.target.value)}
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="text-3xl text-secondary"
             >
-              <option disabled value="">
-                Select an account
-              </option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </select>
+              <FiSettings />
+            </button>
 
-            <div className="flex space-x-2 justify-end sm:justify-start">
-              <button className="text-3xl">
-                <BiSolidEditAlt
-                  onClick={() => {
-                    if (accounts.length === 0) {
-                      toast.warn("Add an account first!")
-                    } else {
-                      setEditingAccountModal(true)
-                      setAccountName(selectedAccount?.name || "")
-                      document.getElementById("account_modal").showModal()
-                    }
-                  }}
-                />
-              </button>
+          </div>
 
-              <button className="text-3xl">
-                <MdOutlineAddCircleOutline
+          <span className="text-3xl text-primary font-bold">
+            Hi {user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : "Guest"}!
+          </span>
+
+        </header>
+
+        <main className="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
+          <div className="grid gap-6 md:grid-cols-[1fr_300px]">
+            {/* Main Content */}
+            <div className="space-y-6">
+              <div className="flex space-x-2 items-center">
+                <h2 className="text-2xl font-bold text-accent">Accounts</h2>
+                <button
+                  className="text-primary text-2xl"
                   onClick={() => {
                     setEditingAccountModal(false)
                     document.getElementById("account_modal").showModal()
                   }}
-                />
-              </button>
+                >
+                  <MdOutlineAddCircleOutline />
+                </button>
+              </div>
+
+              {accounts.length === 0 ? (
+                <div className="card bg-base-200 shadow-xl p-8 text-center">
+                  <h3 className="text-xl font-semibold text-primary mb-4">No Accounts Yet</h3>
+                  <p className="text-base-content mb-6">Create your first account to start tracking your finances</p>
+                  <button
+                    className="btn btn-accent mx-auto"
+                    onClick={() => {
+                      setEditingAccountModal(false)
+                      document.getElementById("account_modal").showModal()
+                    }}
+                  >
+                    <MdOutlineAddCircleOutline className="text-lg mr-2" />
+                    Create Account
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {accounts.map((account) => (
+                    <div
+                      key={account.id}
+                      className={`card bg-base-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer ${selectedAccount?.id === account.id ? "ring-2 ring-secondary" : ""
+                        }`}
+                      onClick={() => handleAccountSelect(account.id)}
+                    >
+                      <div className="card-body">
+                        <div className="flex justify-between items-center">
+                          <h3 className="card-title text-accent flex items-center gap-2">
+                            <RiWalletLine />
+                            {account.name}
+                          </h3>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEditingAccountModal(true)
+                              setSelectedAccount(account)
+                              setAccountName(account.name)
+                              document.getElementById("account_modal").showModal()
+                            }}
+                          >
+                            <BiSolidEditAlt className="text-lg" />
+                          </button>
+                        </div>
+                        <div className="mt-2">
+                          <p className="text-sm text-base-content/70">Balance</p>
+                          <p className="text-2xl font-bold text-primary">{formatCurrency(account.balance)}</p>
+                        </div>
+                        <div className="card-actions justify-end mt-4">
+                          <button
+                            className="btn btn-primary btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openFinancesWithAccount(account)
+                            }}
+                          >
+                            View Transactions
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Settings Panel */}
+            {showSettings && (
+              <div className="card bg-base-200 shadow-xl p-4">
+                <h3 className="text-xl font-bold text-accent mb-4">Settings</h3>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-medium">Theme</span>
+                  </label>
+                  <select className="select select-bordered w-full" value={theme} onChange={handleThemeChange}>
+                    {themes.map((themeOption) => (
+                      <option key={themeOption} value={themeOption}>
+                        {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="font-medium mb-2">Preview</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    <div className="badge badge-primary">Primary</div>
+                    <div className="badge badge-secondary">Secondary</div>
+                    <div className="badge badge-accent">Accent</div>
+                    <div className="badge badge-neutral">Neutral</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
-          <button
-            className="btn btn-primary w-full"
-            onClick={openFinancesWithAccount}
-            disabled={!selectedAccount}
-          >
-            View Transactions
-          </button>
-
-        </div>
-
-        {/* Theme Selection */}
-        <div className="card bg-base-200 shadow-xl p-4">
-
-          <span
-            className="text-accent text-xl font-bold label-text mb-4"
-          >
-            Configs
-          </span>
-
-          <label className="form-control">
-            <div className="label">
-              <span
-                className="text-secondary font-bold label-text"
-              >
-                Select a Theme
-              </span>
-            </div>
-
-            <select
-              className="select select-primary"
-              value={theme}
-              onChange={handleThemeChange}
-            >
-              <option disabled>Select a theme</option>
-              {themes.map((themeOption) => (
-                <option key={themeOption} value={themeOption}>
-                  {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-        </div>
+        </main>
 
         {/* Account Modal */}
         <BaseModal
@@ -261,43 +291,50 @@ const HomeScreen = () => {
           title={editingAccountModal ? "Edit Account" : "Add Account"}
           onClose={resetAccountForm}
         >
-          <form onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount} className="space-y-2 w-96">
-            <input
-              required
-              type="text"
-              name="name"
-              placeholder="Account name"
-              className="input input-bordered w-full"
-              value={accountName}
-              onChange={(e) => setAccountName(e.target.value)}
-            />
+          <form
+            onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount}
+            className="space-y-4 w-96"
+          >
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Account Name</span>
+              </label>
+              <input
+                required
+                type="text"
+                name="name"
+                placeholder="Enter account name"
+                className="input input-bordered w-full"
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+              />
+            </div>
 
             <button type="submit" className="btn btn-primary w-full">
-              Save
+              {editingAccountModal ? "Update Account" : "Create Account"}
             </button>
 
             {editingAccountModal && !confirmingAccountDelete && (
-              <button
-                className="btn bg-red-400 border-none w-full"
-                onClick={() => setConfirmingAccountDelete(true)}
-                type="button"
-              >
+              <button className="btn btn-error w-full" onClick={() => setConfirmingAccountDelete(true)} type="button">
                 Delete Account
               </button>
             )}
 
             {confirmingAccountDelete && (
-              <div className="flex space-x-2">
-                <button className="btn bg-green-400 border-none flex-1" onClick={handleDeleteAccount} type="button">
-                  Confirm
-                </button>
-                <button
-                  className="btn bg-red-400 border-none flex-1"
-                  onClick={() => setConfirmingAccountDelete(false)}
-                  type="button"
-                >
-                  Cancel
-                </button>
+              <div className="p-4 border border-error rounded-lg bg-error/10">
+                <p className="text-error font-medium mb-4">Are you sure you want to delete this account?</p>
+                <div className="flex space-x-2">
+                  <button className="btn btn-error flex-1" onClick={handleDeleteAccount} type="button">
+                    Yes, Delete
+                  </button>
+                  <button
+                    className="btn btn-outline flex-1"
+                    onClick={() => setConfirmingAccountDelete(false)}
+                    type="button"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             )}
           </form>
