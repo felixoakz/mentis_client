@@ -148,7 +148,7 @@ const HomeScreen = () => {
     <Layout>
       <div className="flex flex-col min-h-screen bg-base-100">
         {/* Header */}
-        <header className="flex justify-between items-center p-4 bg-base-200 shadow-md">
+        <header className="flex justify-between items-center p-4 bg-base-200 shadow-md w-full">
 
           <div className="flex items-center gap-4">
 
@@ -171,10 +171,13 @@ const HomeScreen = () => {
 
         </header>
 
+
         <main className="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
           <div className="grid gap-6 md:grid-cols-[1fr_300px]">
+
             {/* Main Content */}
             <div className="space-y-6">
+
               <div className="flex space-x-2 items-center">
                 <h2 className="text-2xl font-bold text-accent">Accounts</h2>
                 <button
@@ -208,8 +211,7 @@ const HomeScreen = () => {
                   {accounts.map((account) => (
                     <div
                       key={account.id}
-                      className={`card bg-base-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer ${selectedAccount?.id === account.id ? "ring-2 ring-secondary" : ""
-                        }`}
+                      className={`card bg-base-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer`}
                       onClick={() => handleAccountSelect(account.id)}
                     >
                       <div className="card-body">
@@ -262,7 +264,11 @@ const HomeScreen = () => {
                   <label className="label">
                     <span className="label-text font-medium">Theme</span>
                   </label>
-                  <select className="select select-bordered w-full" value={theme} onChange={handleThemeChange}>
+                  <select
+                    className="select select-bordered w-full"
+                    value={theme}
+                    onChange={handleThemeChange}
+                  >
                     {themes.map((themeOption) => (
                       <option key={themeOption} value={themeOption}>
                         {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
@@ -293,7 +299,7 @@ const HomeScreen = () => {
         >
           <form
             onSubmit={editingAccountModal ? handleEditAccount : handleAddAccount}
-            className="space-y-4 w-96"
+            className="space-y-4"
           >
             <div className="form-control">
               <label className="label">

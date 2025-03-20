@@ -222,7 +222,7 @@ const FinancesScreen = () => {
         >
           <form
             onSubmit={editingTransactionModal ? handleEditTransaction : handleAddTransaction}
-            className="space-y-2 w-96"
+            className="space-y-2"
           >
             <CurrencyInput
               required
