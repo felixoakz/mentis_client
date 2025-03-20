@@ -157,7 +157,7 @@ const FinancesScreen = () => {
         </h1>
 
         {/* Transactions */}
-        <div className="flex-grow overflow-y-auto h-[80vh] my-4">
+        <div className="flex-grow overflow-y-auto h-[60vh] my-4">
 
           {Object.keys(groupedTransactions).length > 0 ?
             (

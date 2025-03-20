@@ -148,7 +148,7 @@ const HomeScreen = () => {
     <Layout>
       <div className="flex flex-col min-h-screen bg-base-100">
         {/* Header */}
-        <header className="flex justify-between items-center p-4 bg-base-200 shadow-md w-full">
+        <header className="w-screen flex justify-between items-center p-4 bg-base-200 shadow-md">
 
           <div className="flex items-center gap-4">
 
