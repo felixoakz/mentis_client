@@ -80,7 +80,9 @@ const FinancesScreen = () => {
     }
 
     try {
-      await editTransaction(selectedTransaction.id, transactionData)
+      const res = await editTransaction(selectedTransaction.id, transactionData)
+      setBalance(res.data.newBalance.balance)
+
       // Refresh transactions
       getTransactions(accountId)
       resetForm()
@@ -94,7 +96,8 @@ const FinancesScreen = () => {
     event.preventDefault()
 
     try {
-      await deleteTransaction(selectedTransaction.id)
+      const res = await deleteTransaction(selectedTransaction.id)
+      setBalance(res.data.newBalance.balance)
       // Refresh transactions
       getTransactions(accountId)
       resetForm()
