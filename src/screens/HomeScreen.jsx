@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const [accountName, setAccountName] = useState("")
   const [editingAccountModal, setEditingAccountModal] = useState(false)
   const [confirmingAccountDelete, setConfirmingAccountDelete] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
+
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme)
@@ -147,8 +147,9 @@ const HomeScreen = () => {
   return (
     <Layout>
       <div className="flex flex-col min-h-screen bg-base-100">
+
         {/* Header */}
-        <header className="w-screen flex justify-between items-center p-4 bg-base-200 shadow-md">
+        <header className="w-screen md:w-full lg:w-full flex justify-between items-center p-4 bg-base-200 shadow-md">
 
           <div className="flex items-center gap-4">
 
@@ -157,7 +158,7 @@ const HomeScreen = () => {
             </button>
 
             <button
-              onClick={() => setShowSettings(!showSettings)}
+              onClick={() => document.getElementById("config_modal").showModal()}
               className="text-3xl text-secondary"
             >
               <FiSettings />
@@ -255,39 +256,6 @@ const HomeScreen = () => {
               )}
             </div>
 
-            {/* Settings Panel */}
-            {showSettings && (
-              <div className="card bg-base-200 shadow-xl p-4">
-                <h3 className="text-xl font-bold text-accent mb-4">Settings</h3>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">Theme</span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full"
-                    value={theme}
-                    onChange={handleThemeChange}
-                  >
-                    {themes.map((themeOption) => (
-                      <option key={themeOption} value={themeOption}>
-                        {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mt-6">
-                  <h4 className="font-medium mb-2">Preview</h4>
-                  <div className="flex gap-2 flex-wrap">
-                    <div className="badge badge-primary">Primary</div>
-                    <div className="badge badge-secondary">Secondary</div>
-                    <div className="badge badge-accent">Accent</div>
-                    <div className="badge badge-neutral">Neutral</div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </main>
 
@@ -327,8 +295,10 @@ const HomeScreen = () => {
             )}
 
             {confirmingAccountDelete && (
-              <div className="p-4 border border-error rounded-lg bg-error/10">
-                <p className="text-error font-medium mb-4">Are you sure you want to delete this account?</p>
+              <div className="p-4 border border-error rounded-lg bg-error/10 text-center">
+                <p className="text-error font-medium mb-4 break-words max-w-sm mx-auto">
+                  Are you sure you want to delete account? All related transactions will be erased.
+                </p>
                 <div className="flex space-x-2">
                   <button className="btn btn-error flex-1" onClick={handleDeleteAccount} type="button">
                     Yes, Delete
@@ -342,8 +312,44 @@ const HomeScreen = () => {
                   </button>
                 </div>
               </div>
+
             )}
           </form>
+        </BaseModal>
+
+        <BaseModal
+          id={"config_modal"}
+        >
+          <div className="card bg-base-200 shadow-xl p-4">
+            <h3 className="text-xl font-bold text-accent mb-4">Settings</h3>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Theme</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={theme}
+                onChange={handleThemeChange}
+              >
+                {themes.map((themeOption) => (
+                  <option key={themeOption} value={themeOption}>
+                    {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-medium mb-2">Preview</h4>
+              <div className="flex gap-2 flex-wrap">
+                <div className="badge badge-primary">Primary</div>
+                <div className="badge badge-secondary">Secondary</div>
+                <div className="badge badge-accent">Accent</div>
+                <div className="badge badge-neutral">Neutral</div>
+              </div>
+            </div>
+          </div>
         </BaseModal>
       </div>
     </Layout>
