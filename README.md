@@ -1,4 +1,4 @@
-# Mentis - Personal Finance App
+# Mentis - Personal Finance App 🌐💰
 
 [**Mentis Live**](http://appmentis.ddns.net)
 
@@ -7,56 +7,56 @@ Mentis is a modern personal finance application designed to help you manage your
 ## Key Features
 
 ### 1. **Multiple Account Management**
-- Create and manage multiple financial accounts with different balances and purposes.
-- ![Wallet Icon](https://img.icons8.com/ios/50/000000/wallet.png)
+- Create and manage multiple financial accounts with different balances and purposes.  
+📊
 
 ### 2. **Transaction Tracking**
-- Add, edit, and delete transactions with automatic balance updates and chronological organization.
-- ![Edit Icon](https://img.icons8.com/ios/50/000000/edit.png)
+- Add, edit, and delete transactions with automatic balance updates and chronological organization.  
+✏️
 
 ### 3. **User Authentication**
-- Secure login and registration system with validation to protect your financial data.
-- ![Check Circle Icon](https://img.icons8.com/ios/50/000000/check-circle.png)
+- Secure login and registration system with validation to protect your financial data.  
+✅
 
 ### 4. **Customizable Themes**
-- Choose from multiple themes to personalize your experience with the app.
-- ![Palette Icon](https://img.icons8.com/ios/50/000000/palette.png)
+- Choose from multiple themes to personalize your experience with the app.  
+🎨
 
 ### 5. **Responsive Design**
-- Fully responsive interface that works seamlessly on desktop, tablet, and mobile devices.
-- ![Dashboard Icon](https://img.icons8.com/ios/50/000000/dashboard.png)
+- Fully responsive interface that works seamlessly on desktop, tablet, and mobile devices.  
+📱
 
 ### 6. **Real-time Balance Updates**
-- Instantly see how transactions affect your account balances with real-time calculations.
-- ![Add Circle Icon](https://img.icons8.com/ios/50/000000/plus-circle.png)
+- Instantly see how transactions affect your account balances with real-time calculations.  
+➕
 
 ---
 
 ## Technology Stack
 
 ### 1. **React**
-- Frontend library for building the user interface with reusable components.
-- ![React Icon](https://img.icons8.com/ios/50/000000/react.png)
+- Frontend library for building the user interface with reusable components.  
+⚛️
 
 ### 2. **React Router**
-- Client-side routing for navigation between different views.
-- ![Route Icon](https://img.icons8.com/ios/50/000000/route.png)
+- Client-side routing for navigation between different views.  
+🛣️
 
 ### 3. **DaisyUI**
-- Component library for Tailwind CSS with theme support.
-- ![Palette Icon](https://img.icons8.com/ios/50/000000/palette.png)
+- Component library for Tailwind CSS with theme support.  
+🎨
 
 ### 4. **React Hook Form**
-- Form validation and handling with minimal re-renders.
-- ![Form Icon](https://img.icons8.com/ios/50/000000/form.png)
+- Form validation and handling with minimal re-renders.  
+📝
 
 ### 5. **Context API**
-- State management for authentication and user data.
-- ![Dashboard Icon](https://img.icons8.com/ios/50/000000/dashboard.png)
+- State management for authentication and user data.  
+📊
 
 ### 6. **RESTful API**
-- Backend communication for data persistence and retrieval.
-- ![Server Icon](https://img.icons8.com/ios/50/000000/server.png)
+- Backend communication for data persistence and retrieval.  
+🌐
 
 ---
 
