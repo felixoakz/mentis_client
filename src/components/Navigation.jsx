@@ -5,10 +5,12 @@ import LoginScreen from "@/screens/LoginScreen"
 import RegisterScreen from "@/screens/RegisterScreen"
 import HomeScreen from "@/screens/HomeScreen"
 import FinancesScreen from "@/screens/FinancesScreen"
+import AboutScreen from "@/screens/AboutScreen"
 
 export default function Navigation() {
   return (
     <Routes>
+      <Route path="/about" element={<AboutScreen />} />
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />
 
