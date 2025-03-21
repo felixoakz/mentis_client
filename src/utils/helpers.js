@@ -1,14 +1,16 @@
 import { toast } from "react-toastify";
 
 // Handles API response errors and displays toast notifications.
-export const responseErrors = async (error) => {
-
+export const responseErrors = async (error, logout = null) => {
   if (error.message === 'Network Error') {
     toast.error('No server connection.');
   }
 
   if (error.response) {
     const errorMsg = `${error.response.data.message ?? error.response.data.error}`
+
+    if (error.response.status === 401) await logout()
+
     toast.warn(errorMsg)
   }
 };

@@ -61,8 +61,9 @@ const HomeScreen = () => {
       const accountsData = res.data.accounts
       setAccounts(accountsData)
       setSelectedAccount(accountsData[0] ?? null)
+
     } catch (error) {
-      responseErrors(error)
+      responseErrors(error, logout)
     }
   }
 
