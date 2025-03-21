@@ -213,17 +213,25 @@ const HomeScreen = () => {
                   {accounts.map((account) => (
                     <div
                       key={account.id}
-                      className={`card bg-base-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer`}
+                      className={`card bg-base-200 shadow-xl hover:shadow-2xl transition-all`}
                       onClick={() => handleAccountSelect(account.id)}
                     >
                       <div className="card-body">
-                        <div className="flex justify-between items-center">
-                          <h3 className="card-title text-accent flex items-center gap-2">
-                            <RiWalletLine />
-                            {account.name}
-                          </h3>
+
+                        <h3 className="card-title text-accent text-2xl flex items-center break-words truncate">
+                          <RiWalletLine />
+                          {account.name}
+                        </h3>
+
+                        <div className="mt-2">
+                          <p className="text-sm text-base-content/70">Balance</p>
+                          <p className="text-2xl font-bold text-primary">{formatCurrency(account.balance)}</p>
+                        </div>
+
+                        <div className="card-actions justify-end mt-4">
+
                           <button
-                            className="btn btn-ghost btn-sm"
+                            className="btn btn-secondary btn-sm"
                             onClick={(e) => {
                               e.stopPropagation()
                               setEditingAccountModal(true)
@@ -232,16 +240,11 @@ const HomeScreen = () => {
                               document.getElementById("account_modal").showModal()
                             }}
                           >
-                            <BiSolidEditAlt className="text-lg" />
+                            Edit Account
                           </button>
-                        </div>
-                        <div className="mt-2">
-                          <p className="text-sm text-base-content/70">Balance</p>
-                          <p className="text-2xl font-bold text-primary">{formatCurrency(account.balance)}</p>
-                        </div>
-                        <div className="card-actions justify-end mt-4">
+
                           <button
-                            className="btn btn-primary btn-sm"
+                            className="btn btn-accent btn-sm"
                             onClick={(e) => {
                               e.stopPropagation()
                               openFinancesWithAccount(account)
