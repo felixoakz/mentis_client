@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 const Layout = ({ children }) => {
+
   useEffect(() => {
     const applyTheme = () => {
       const theme = localStorage.getItem("theme") || "synthwave";

@@ -22,9 +22,7 @@ export default function LoginScreen() {
     <Layout>
       <div className="flex flex-col items-center">
 
-
-
-        <h1 className="text-3xl font-bold mb-12">mentis</h1>
+        <h1 className="text-3xl text-secondary font-bold mb-12">mentis</h1>
 
         <form
           onSubmit={handleSubmit(proceedLogin)}
@@ -59,13 +57,13 @@ export default function LoginScreen() {
 
         </form>
 
-        <div className="hero bg-base-200 p-4 mt-24">
+        <div className="hero bg-base-200 p-4 mt-24 rounded-lg">
           <div className="hero-content text-center">
             <div className="max-w-md">
-              <p className="py-6">
+              <p className="font-bold text-primary py-6">
                 A modern personal finance application designed to help you manage your accounts and track your transactions with ease.
               </p>
-              <button className="btn btn-outline" onClick={() => navigate('/about')}>
+              <button className="btn btn-outline text-accent" onClick={() => navigate('/about')}>
                 Learn More
               </button>
             </div>

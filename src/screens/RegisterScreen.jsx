@@ -28,7 +28,7 @@ export default function Register() {
     <Layout>
       <div className="flex flex-col items-center">
 
-        <h1 className="text-3xl font-bold mb-12">mentis</h1>
+        <h1 className="text-3xl text-secondary font-bold mb-12">mentis</h1>
 
         <form
           onSubmit={handleSubmit(proceedRegister, displayValidationErrors)}
