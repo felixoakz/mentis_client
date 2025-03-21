@@ -205,10 +205,10 @@ const FinancesScreen = () => {
 
         </div>
 
-        {/* Add transaction and balance */}
-        <div className="flex justify-end">
+        {/* Add transaction */}
+        <div className="flex justify-end absolute bottom-4 right-4 bg-neutral rounded-full">
           <button
-            className="text-5xl text-secondary"
+            className="text-7xl text-accent"
             onClick={() => {
               setEditingTransactionModal(false)
               document.getElementById("transaction_modal").showModal()
