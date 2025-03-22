@@ -1,8 +1,11 @@
 import apiClient from "./base";
 
 
-export const listTransactions = async (accountId) => {
-  return await apiClient.get(`/transactions/${accountId}`)
+export const listTransactions = async (accountId, currentDate) => {
+  const year = currentDate.year.toString()
+  const month = currentDate.monthInt.toString()
+
+  return await apiClient.get(`/transactions/${accountId}?year=${year}&month=${month}`)
 }
 
 export const createTransaction = async (transactionData) => {
