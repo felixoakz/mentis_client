@@ -101,7 +101,8 @@ const FinancesScreen = () => {
     try {
       const res = await createTransaction(transactionData)
       setBalance(res.data.newBalance.balance)
-      getTransactions(accountId)
+      getTransactions(accountId, currentDateRef.current)
+
       resetForm()
       document.getElementById("transaction_modal").close()
 
@@ -121,7 +122,7 @@ const FinancesScreen = () => {
     try {
       const res = await editTransaction(selectedTransaction.id, transactionData)
       setBalance(res.data.newBalance.balance)
-      getTransactions(accountId)
+      getTransactions(accountId, currentDateRef.current)
       resetForm()
       document.getElementById("transaction_modal").close()
 
@@ -136,7 +137,7 @@ const FinancesScreen = () => {
     try {
       const res = await deleteTransaction(selectedTransaction.id)
       setBalance(res.data.newBalance.balance)
-      getTransactions(accountId)
+      getTransactions(accountId, currentDateRef.current)
       resetForm()
       document.getElementById("transaction_modal").close()
 
@@ -276,17 +277,19 @@ const FinancesScreen = () => {
         </div>
 
         {/* Add transaction */}
-        <div className="flex justify-end absolute bottom-4 right-4 bg-neutral rounded-full">
-          <button
-            className="text-7xl text-accent"
-            onClick={() => {
-              setEditingTransactionModal(false)
-              document.getElementById("transaction_modal").showModal()
-            }}
-          >
-            <MdOutlineAddCircleOutline />
-          </button>
-        </div>
+        {!(currentDateRef.current.monthInt !== new Date().getMonth() + 1 || currentDateRef.current.year !== new Date().getFullYear()) &&
+          <div className="flex justify-end absolute bottom-4 right-4 bg-neutral rounded-full">
+            <button
+              className="text-7xl text-accent"
+              onClick={() => {
+                setEditingTransactionModal(false)
+                document.getElementById("transaction_modal").showModal()
+              }}
+            >
+              <MdOutlineAddCircleOutline />
+            </button>
+          </div>
+        }
 
         <BaseModal
           id={"transaction_modal"}
@@ -321,6 +324,7 @@ const FinancesScreen = () => {
               className="input input-bordered w-full"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              maxLength={40}
             />
 
             <button type="submit" className="btn btn-primary w-full">

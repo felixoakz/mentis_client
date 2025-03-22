@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import Layout from "@/components/Layout"
-import { BiSolidEditAlt } from "react-icons/bi"
 import { MdOutlineAddCircleOutline } from "react-icons/md"
 import { RiLogoutBoxLine, RiWalletLine } from "react-icons/ri"
 import { FiSettings } from "react-icons/fi"
@@ -285,6 +284,7 @@ const HomeScreen = () => {
                 className="input input-bordered w-full"
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
+                maxLength={16}
               />
             </div>
 
