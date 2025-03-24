@@ -23,6 +23,7 @@ const FinancesScreen = () => {
 
   const [transactions, setTransactions] = useState([])
   const [amount, setAmount] = useState("")
+  const [isExpense, setIsExpense] = useState(true);
   const [description, setDescription] = useState("")
   const [selectedTransaction, setSelectedTransaction] = useState(null)
   const [editingTransactionModal, setEditingTransactionModal] = useState(false)
@@ -94,9 +95,9 @@ const FinancesScreen = () => {
 
     const transactionData = {
       account_id: accountId,
-      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
+      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)) * (isExpense ? -1 : 1),
       description,
-    }
+    };
 
     try {
       const res = await createTransaction(transactionData)
@@ -114,10 +115,11 @@ const FinancesScreen = () => {
   const handleEditTransaction = async (event) => {
     event.preventDefault()
 
+
     const transactionData = {
-      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)),
+      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)) * (isExpense ? -1 : 1),
       description,
-    }
+    };
 
     try {
       const res = await editTransaction(selectedTransaction.id, transactionData)
@@ -296,25 +298,45 @@ const FinancesScreen = () => {
           title={editingTransactionModal ? "Edit Transaction" : "Add Transaction"}
           onClose={resetForm}
         >
+
           <form
             onSubmit={editingTransactionModal ? handleEditTransaction : handleAddTransaction}
             className="space-y-2"
           >
-            <CurrencyInput
-              required
-              name="amount"
-              value={amount}
-              onValueChange={(value) => setAmount(value)}
-              placeholder="Amount"
-              className="input input-bordered w-full"
-              decimalsLimit={2}
-              allowDecimals
-              inputMode="text"
-              prefix="$"
-              decimalSeparator=","
-              groupSeparator="."
-              disableGroupSeparators={false}
-            />
+            <div className="flex space-x-2">
+
+              <CurrencyInput
+                required
+                name="amount"
+                value={amount}
+                onValueChange={(value) => setAmount(value)}
+                placeholder="Amount"
+                className="input input-bordered w-full"
+                decimalsLimit={2}
+                allowDecimals
+                inputMode="decimal"
+                pattern="[0-9,]*"
+                prefix="$"
+                decimalSeparator=","
+                groupSeparator="."
+                disableGroupSeparators={false}
+              />
+
+              <fieldset className="fieldset bg-base-100 rounded-box flex items-center">
+                <label htmlFor="isExpense" className="flex flex-col text-sm">
+                  <input
+                    id="isExpense"
+                    type="checkbox"
+                    className="toggle"
+                    checked={isExpense}
+                    onChange={() => setIsExpense(!isExpense)}
+                  />
+                  <span>{isExpense ? "Expense" : "Income"}</span>
+                </label>
+              </fieldset>
+
+            </div>
+
 
             <input
               required
