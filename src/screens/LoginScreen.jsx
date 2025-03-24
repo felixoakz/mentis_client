@@ -20,13 +20,13 @@ export default function LoginScreen() {
 
   return (
     <Layout>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center m-12">
 
         <h1 className="text-3xl text-secondary font-bold mb-12">mentis</h1>
 
         <form
           onSubmit={handleSubmit(proceedLogin)}
-          className="flex flex-col space-y-4 w-full max-w-md"
+          className="flex flex-col space-y-3"
         >
           <input
             className="input input-bordered w-full"
