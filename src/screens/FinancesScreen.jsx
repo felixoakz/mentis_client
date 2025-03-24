@@ -314,7 +314,7 @@ const FinancesScreen = () => {
                 className="input input-bordered w-full"
                 decimalsLimit={2}
                 allowDecimals
-                inputMode="numeric"
+                inputMode="decimal"
                 pattern="[0-9,]*"
                 prefix="$"
                 decimalSeparator=","
