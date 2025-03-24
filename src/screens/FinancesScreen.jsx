@@ -95,7 +95,7 @@ const FinancesScreen = () => {
 
     const transactionData = {
       account_id: accountId,
-      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)) * (isExpense ? -1 : 1),
+      amount: Number(new Big(amount.replace(",", ".").replace('-', '')).times(100).toFixed(0)) * (isExpense ? -1 : 1),
       description,
     };
 
@@ -115,9 +115,8 @@ const FinancesScreen = () => {
   const handleEditTransaction = async (event) => {
     event.preventDefault()
 
-
     const transactionData = {
-      amount: Number(new Big(amount.replace(",", ".")).times(100).toFixed(0)) * (isExpense ? -1 : 1),
+      amount: Number(new Big(amount.replace(",", ".").replace('-', '')).times(100).toFixed(0)) * (isExpense ? -1 : 1),
       description,
     };
 
@@ -384,4 +383,3 @@ const FinancesScreen = () => {
 }
 
 export default FinancesScreen
-
