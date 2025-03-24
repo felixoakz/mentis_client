@@ -315,7 +315,6 @@ const FinancesScreen = () => {
                 decimalsLimit={2}
                 allowDecimals
                 inputMode="text"
-                pattern="[0-9,]*"
                 prefix="$"
                 decimalSeparator=","
                 groupSeparator="."
