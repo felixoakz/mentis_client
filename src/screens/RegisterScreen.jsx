@@ -10,13 +10,14 @@ import { displayValidationErrors } from '@/utils/helpers';
 export default function Register() {
   const navigate = useNavigate();
   const { register, handleSubmit, watch } = useForm();
-  const { registerUser } = useAuth();
+  const { registerUser, login } = useAuth();
 
   const password = watch('password');
 
   const proceedRegister = async (data) => {
     try {
       await registerUser(data);
+      await login(data);
       navigate('/');
 
     } catch (error) {
