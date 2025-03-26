@@ -1,12 +1,12 @@
 const images = [
   {
-    image: "../../public/account.png",
+    image: "./account.png",
   },
   {
-    image: "../../public/home.png",
+    image: "./home.png",
   },
   {
-    image: "../../public/settings.png",
+    image: "./settings.png",
   },
 ];
 
