@@ -7,6 +7,7 @@ export default function LoginScreen() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const { login } = useAuth();
+  const backendConnected = !!import.meta.env.VITE_API_URL;
 
   const proceedLogin = async (loginData) => {
     try {
@@ -24,15 +25,23 @@ export default function LoginScreen() {
 
         <h1 className="text-3xl text-secondary font-bold mb-12">mentis</h1>
 
+        {!backendConnected && (
+          <div className="alert alert-error mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Backend is disconnected - login unavailable</span>
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit(proceedLogin)}
-          className="flex flex-col space-y-3"
+          className="flex flex-col space-y-3 w-full"
         >
           <input
             className="input input-bordered w-full"
             {...register('email', { required: 'Email is required' })}
             placeholder="Email"
             type="email"
+            disabled={!backendConnected}
           />
 
           <input
@@ -40,9 +49,10 @@ export default function LoginScreen() {
             {...register('password', { required: 'Password is required' })}
             placeholder="Password"
             type="password"
+            disabled={!backendConnected}
           />
 
-          <button type="submit" className="btn btn-primary w-full">
+          <button type="submit" className="btn btn-primary w-full" disabled={!backendConnected}>
             Login
           </button>
 

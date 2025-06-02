@@ -11,6 +11,7 @@ export default function Register() {
   const navigate = useNavigate();
   const { register, handleSubmit, watch } = useForm();
   const { registerUser, login } = useAuth();
+  const backendConnected = !!import.meta.env.VITE_API_URL;
 
   const password = watch('password');
 
@@ -31,6 +32,13 @@ export default function Register() {
 
         <h1 className="text-3xl text-secondary font-bold mb-12">mentis</h1>
 
+        {!backendConnected && (
+          <div className="alert alert-error mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Backend is disconnected - registration unavailable</span>
+          </div>
+        )}
+
         <form
           onSubmit={handleSubmit(proceedRegister, displayValidationErrors)}
           className="flex flex-col space-y-4 w-full max-w-md"
@@ -41,6 +49,7 @@ export default function Register() {
               className="input input-bordered w-full"
               placeholder="Username"
               type="text"
+              disabled={!backendConnected}
             />
           </div>
 
@@ -56,6 +65,7 @@ export default function Register() {
               className="input input-bordered w-full"
               placeholder="Email"
               type="text"
+              disabled={!backendConnected}
             />
           </div>
 
@@ -75,6 +85,7 @@ export default function Register() {
               className="input input-bordered w-full"
               placeholder="Password"
               type="password"
+              disabled={!backendConnected}
             />
           </div>
 
@@ -87,11 +98,12 @@ export default function Register() {
               className="input input-bordered w-full"
               placeholder="Confirm Password"
               type="password"
+              disabled={!backendConnected}
             />
           </div>
 
           <div className="mt-6 form-control">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary" disabled={!backendConnected}>
               Register
             </button>
           </div>
