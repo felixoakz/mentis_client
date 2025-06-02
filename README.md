@@ -1,7 +1,5 @@
 # Mentis - Personal Finance App 🌐💰
 
-[**Backend Code**](https://github.com/felixoakz/mentis_server)
-
 Mentis is a minimal, responsive personal finance tracker. It lets users manage multiple accounts and transactions with real-time balance updates. Built as a portfolio demo, it runs in **demo mode** with disabled auth and mock data.
 
 ---
