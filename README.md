@@ -28,4 +28,4 @@ Mentis is a minimal, responsive personal finance tracker. It lets users manage m
 - Uses local state with mock data.
 - Full backend code: [mentis_server](https://github.com/felixoakz/mentis_server)
 
-Explore the [**Live Demo**](https://mentis-client.vercel.app/login) to see it in action.
+Explore the [**Live Demo**](https://mentis-client.vercel.app) to see it in action.
